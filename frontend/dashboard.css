@@ -1,0 +1,173 @@
+.nav-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.toolbar,
+.pagination,
+.list-heading,
+.item-heading,
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar {
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.secondary {
+  background: #edf2fa;
+  color: #243d65;
+}
+
+.secondary:hover {
+  background: #dce6f5;
+}
+
+.status-tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.status-tab {
+  padding: 14px 10px;
+  background: white;
+  color: #344760;
+  border: 1px solid var(--border);
+}
+
+.status-tab:hover {
+  background: #eaf0ff;
+}
+
+.status-tab[aria-pressed="true"] {
+  color: white;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.status-tab strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+}
+
+.list-heading,
+.item-heading {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.commitment-item {
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+}
+
+.commitment-item h3 {
+  margin: 0;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.item-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.status-pill {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #edf2fa;
+}
+
+.status-pending {
+  background: #eaf0ff;
+  color: #244ca1;
+}
+
+.status-incomplete {
+  background: #fff3d9;
+  color: #805400;
+}
+
+.status-overdue {
+  background: #ffebe7;
+  color: #9a3024;
+}
+
+.status-completed {
+  background: #e5f5eb;
+  color: #216340;
+}
+
+.status-discarded {
+  background: #eef0f3;
+  color: #536174;
+}
+
+.item-actions {
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.pagination {
+  justify-content: space-between;
+  margin-top: 22px;
+}
+
+.empty-state {
+  padding: 35px 15px;
+  text-align: center;
+  color: var(--muted);
+}
+
+dialog {
+  width: min(760px, calc(100vw - 30px));
+  max-height: 90vh;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  color: inherit;
+  overflow-y: auto;
+}
+
+dialog::backdrop {
+  background: #10233b88;
+}
+
+.action-label {
+  margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+  .status-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .item-heading,
+  .list-heading {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  dialog {
+    padding: 18px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+}

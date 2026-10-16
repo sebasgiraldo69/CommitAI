@@ -1,0 +1,24 @@
+# Entornos y secretos
+.venv/
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Datos locales
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+backups/

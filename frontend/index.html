@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CommitAI | Revisar compromisos</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <p class="eyebrow">DE LA CONVERSACIÓN A LA ACCIÓN</p>
+      <h1>Commit<span>AI</span></h1>
+    </div>
+    <a class="badge" href="/dashboard">Ver mis compromisos →</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Que ninguna promesa se quede en el chat.</h2>
+      <p>
+        Pega una conversación, revisa lo detectado y guarda
+        los compromisos que quieras seguir.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <span class="step">1</span>
+        <h2>Ingresa la conversación</h2>
+      </div>
+
+      <form id="analysis-form">
+        <fieldset id="input-fields">
+          <label for="text">Texto o conversación</label>
+          <textarea
+            id="text"
+            rows="7"
+            maxlength="20000"
+            required
+            placeholder="Jaime: Te envío la propuesta mañana.&#10;Ana: Tenemos que revisar el contrato."
+          ></textarea>
+
+          <div class="grid">
+            <label>
+              Fecha de la conversación
+              <input id="reference-date" type="date" required>
+            </label>
+
+            <label>
+              Zona horaria
+              <input id="timezone" value="America/Bogota" required>
+            </label>
+
+            <label>
+              Origen
+              <select id="source-kind">
+                <option value="text">Texto o chat</option>
+                <option value="email">Correo</option>
+                <option value="meeting">Reunión</option>
+                <option value="other">Otro</option>
+              </select>
+            </label>
+
+            <label>
+              Nombre del origen — opcional
+              <input
+                id="source-label"
+                maxlength="500"
+                placeholder="Reunión del equipo"
+              >
+            </label>
+          </div>
+
+          <details>
+            <summary>Participantes y contexto opcional</summary>
+
+            <div class="grid">
+              <label>
+                Participantes, separados por comas
+                <input id="participants" placeholder="Jaime, Ana">
+              </label>
+
+              <label>
+                Hablante principal
+                <input id="speaker" maxlength="200" placeholder="Jaime">
+              </label>
+
+              <label>
+                Destinatario principal
+                <input id="addressee" maxlength="200" placeholder="Ana">
+              </label>
+            </div>
+
+            <p class="hint">
+              En conversaciones con varios hablantes, conserva sus nombres
+              delante de cada mensaje. La lista de participantes no determina
+              quién dice “yo”.
+            </p>
+          </details>
+
+          <p class="hint">
+            Al analizar, el texto se envía al proveedor de IA configurado.
+            Los compromisos solo se guardan cuando los aceptas y confirmas.
+          </p>
+
+          <button id="analyze-button" type="submit">
+            Analizar conversación
+          </button>
+        </fieldset>
+      </form>
+    </section>
+
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+
+    <section id="review-section" class="panel" hidden>
+      <div class="section-heading">
+        <span class="step">2</span>
+        <div>
+          <h2>Revisa antes de guardar</h2>
+          <p class="hint">
+            Corrige los campos y marca los compromisos que quieras guardar.
+            Los que dejes sin marcar no se guardarán.
+            También puedes seleccionar compromisos incompletos.
+          </p>
+        </div>
+      </div>
+
+      <fieldset id="review-fields">
+        <div id="candidate-list"></div>
+      </fieldset>
+    </section>
+
+    <section id="save-section" class="save-bar" hidden>
+      <p id="selection-summary"></p>
+      <button id="save-button" type="button">
+        Guardar seleccionados
+      </button>
+    </section>
+
+    <section id="saved-section" class="panel" hidden>
+      <div class="section-heading">
+        <span class="step">✓</span>
+        <h2>Compromisos guardados</h2>
+      </div>
+      <ul id="saved-list"></ul>
+      <p class="hint">
+        Estos registros ya están en la base de datos.
+        <a href="/dashboard">Abrir el dashboard de seguimiento →</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>CommitAI · Tú revisas y decides qué guardar.</footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CommitAI | Mis compromisos</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/dashboard.css">
+  <script type="module" src="/assets/dashboard.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <p class="eyebrow">SEGUIMIENTO DE COMPROMISOS</p>
+      <h1>Commit<span>AI</span></h1>
+    </div>
+    <a class="nav-link" href="/">+ Analizar conversación</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Tus compromisos, en un solo lugar.</h2>
+      <p>Revisa lo pendiente, completa la información y registra los avances.</p>
+    </section>
+
+    <section class="panel">
+      <form id="filters">
+        <fieldset id="filter-fields">
+          <div class="grid">
+            <label>
+              Responsable
+              <input
+                id="responsible"
+                maxlength="200"
+                placeholder="Nombre completo, por ejemplo: Ana"
+              >
+            </label>
+
+            <label>
+              Ordenar por
+              <select id="sort">
+                <option value="due_asc">Vencimiento más cercano</option>
+                <option value="due_desc">Vencimiento más lejano</option>
+                <option value="created_desc">Creación más reciente</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="toolbar">
+            <button type="submit">Aplicar filtros</button>
+            <button id="clear-filters" type="button" class="secondary">
+              Limpiar filtros
+            </button>
+          </div>
+        </fieldset>
+      </form>
+
+      <p class="hint">
+        El responsable se busca por nombre completo, sin distinguir
+        mayúsculas. Los contadores muestran todos sus estados.
+      </p>
+    </section>
+
+    <nav id="status-tabs" class="status-tabs" aria-label="Filtrar por estado">
+    </nav>
+
+    <p id="dashboard-message" class="message" role="status" aria-live="polite">
+    </p>
+
+    <section class="panel">
+      <div class="list-heading">
+        <div>
+          <h2>Compromisos guardados</h2>
+          <p id="updated-at" class="hint"></p>
+        </div>
+        <button id="refresh" type="button" class="secondary">
+          Actualizar
+        </button>
+      </div>
+
+      <div id="commitment-list"></div>
+
+      <div class="pagination">
+        <button id="previous" type="button" class="secondary">
+          Anterior
+        </button>
+        <span id="page-info" aria-live="polite"></span>
+        <button id="next" type="button" class="secondary">
+          Siguiente
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="editor">
+    <form id="edit-form">
+      <fieldset id="edit-fields">
+        <h2>Detalle del compromiso</h2>
+        <p id="edit-status" class="hint"></p>
+        <p id="edit-origin" class="hint"></p>
+        <blockquote id="edit-quote"></blockquote>
+
+        <div id="edit-inputs" class="grid"></div>
+        <div id="edit-ambiguities"></div>
+
+        <label class="action-label">
+          Acción al guardar
+          <select id="edit-action">
+            <option value="">Conservar estado o recalcular si está abierto</option>
+            <option value="complete">Marcar como completado</option>
+            <option value="discard">Descartar</option>
+            <option value="reopen">Reabrir y recalcular estado</option>
+            <option value="set_pending">Establecer pendiente</option>
+            <option value="set_incomplete">Establecer incompleto</option>
+            <option value="set_overdue">Establecer vencido</option>
+          </select>
+        </label>
+
+        <p class="hint">
+          Pendiente, incompleto y vencido dependen de los datos y de la
+          fecha actual. El servidor rechazará un estado que no corresponda.
+          Editar un compromiso cerrado conserva su cierre, salvo que lo reabras.
+        </p>
+
+        <p id="edit-message" class="message" role="status" aria-live="polite"></p>
+
+        <div class="toolbar">
+          <button type="submit">Guardar cambios</button>
+          <button id="cancel-edit" type="button" class="secondary">
+            Cancelar
+          </button>
+        </div>
+      </fieldset>
+    </form>
+  </dialog>
+
+  <footer>Actualización automática cada 30 segundos mientras consultas la lista.</footer>
+</body>
+</html>
