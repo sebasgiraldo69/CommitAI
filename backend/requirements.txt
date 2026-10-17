@@ -7,3 +7,4 @@ tzdata
 ruff
 bcrypt>=4.0
 pyjwt>=2.8
+psycopg[binary]>=3.1

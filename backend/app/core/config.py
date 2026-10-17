@@ -14,6 +14,7 @@ class Settings:
     app_name: str
     log_level: str
     database_path: Path
+    database_url: str | None
     timezone: str
     ai_provider: str
     ai_model: str
@@ -68,10 +69,15 @@ def get_settings() -> Settings:
     if not database_path.is_absolute():
         database_path = PROJECT_ROOT / database_path
 
+    database_url = os.getenv("DATABASE_URL", "").strip() or None
+    if database_url and database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
     return Settings(
         app_name=os.getenv("APP_NAME", "CommitAI").strip() or "CommitAI",
         log_level=log_level,
         database_path=database_path.resolve(),
+        database_url=database_url,
         timezone=timezone,
         ai_provider=(
             os.getenv("AI_PROVIDER", "unconfigured").strip()

@@ -1,8 +1,7 @@
-import sqlite3
 from uuid import uuid4
 
 from backend.app.core.errors import AppError
-from backend.app.db.database import connection
+from backend.app.db.database import IntegrityError, connection
 
 
 def get_user_by_email(email: str) -> dict | None:
@@ -53,7 +52,7 @@ def create_user(email: str, hashed_password: str) -> dict:
                     """,
                     (user_id, normalized_email, hashed_password),
                 )
-            except sqlite3.IntegrityError:
+            except IntegrityError:
                 raise AppError(
                     "email_already_registered",
                     "Este correo ya se encuentra registrado.",
