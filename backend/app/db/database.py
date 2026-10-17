@@ -31,32 +31,65 @@ def initialize_database() -> None:
                 """
             )
 
-            applied = conn.execute(
+            v1_applied = conn.execute(
                 "SELECT 1 FROM schema_migrations WHERE version = 1"
             ).fetchone()
 
-            if applied:
-                return
-
-            conn.execute(
-                """
-                CREATE TABLE commitments (
-                    id TEXT PRIMARY KEY,
-                    payload TEXT NOT NULL
+            if not v1_applied:
+                conn.execute(
+                    """
+                    CREATE TABLE commitments (
+                        id TEXT PRIMARY KEY,
+                        payload TEXT NOT NULL
+                    )
+                    """
                 )
-                """
-            )
 
-            conn.execute(
-                """
-                CREATE TABLE idempotency_keys (
-                    key TEXT PRIMARY KEY,
-                    request_hash TEXT NOT NULL,
-                    response_json TEXT NOT NULL
+                conn.execute(
+                    """
+                    CREATE TABLE idempotency_keys (
+                        key TEXT PRIMARY KEY,
+                        request_hash TEXT NOT NULL,
+                        response_json TEXT NOT NULL
+                    )
+                    """
                 )
-                """
-            )
 
-            conn.execute(
-                "INSERT INTO schema_migrations (version) VALUES (1)"
-            )
+                conn.execute(
+                    "INSERT INTO schema_migrations (version) VALUES (1)"
+                )
+
+            v2_applied = conn.execute(
+                "SELECT 1 FROM schema_migrations WHERE version = 2"
+            ).fetchone()
+
+            if not v2_applied:
+                conn.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS users (
+                        id TEXT PRIMARY KEY,
+                        email TEXT UNIQUE NOT NULL,
+                        hashed_password TEXT NOT NULL,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+
+                columns = [
+                    row[1]
+                    for row in conn.execute(
+                        "PRAGMA table_info(commitments)"
+                    ).fetchall()
+                ]
+                if "user_id" not in columns:
+                    conn.execute(
+                        "ALTER TABLE commitments ADD COLUMN user_id TEXT"
+                    )
+                    conn.execute(
+                        "CREATE INDEX IF NOT EXISTS idx_commitments_user_id "
+                        "ON commitments(user_id)"
+                    )
+
+                conn.execute(
+                    "INSERT INTO schema_migrations (version) VALUES (2)"
+                )

@@ -57,11 +57,20 @@ class CommitmentTests(unittest.TestCase):
         )
         self.clock_patch.start()
 
+        from backend.app.api.deps import get_current_user
+
+        app.dependency_overrides[get_current_user] = lambda: {
+            "id": "test-user-id",
+            "email": "test@commitai.local",
+            "created_at": "2026-10-15T17:00:00Z",
+        }
+
         self.client = TestClient(app)
         self.client.__enter__()
 
     def tearDown(self):
         self.client.__exit__(None, None, None)
+        app.dependency_overrides.clear()
         self.clock_patch.stop()
         self.settings_patch.stop()
         self.temp.cleanup()

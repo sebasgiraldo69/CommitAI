@@ -20,6 +20,9 @@ class Settings:
     ai_api_key: str
     ai_connect_timeout_seconds: float
     ai_read_timeout_seconds: float
+    jwt_secret_key: str
+    jwt_algorithm: str
+    jwt_expire_minutes: int
 
     @property
     def ai_configured(self) -> bool:
@@ -82,4 +85,9 @@ def get_settings() -> Settings:
         ai_read_timeout_seconds=positive_number(
             "AI_READ_TIMEOUT_SECONDS", "35"
         ),
+        jwt_secret_key=os.getenv(
+            "JWT_SECRET_KEY", "commitai-dev-secret-key-change-in-production"
+        ).strip(),
+        jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256").strip(),
+        jwt_expire_minutes=int(os.getenv("JWT_EXPIRE_MINUTES", "1440")),
     )

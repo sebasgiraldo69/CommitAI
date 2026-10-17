@@ -140,15 +140,26 @@ class AnalysisTests(unittest.TestCase):
             {"candidates": []}
         )
 
-        with TestClient(app) as client:
-            response = client.post(
-                "/api/analyses",
-                json=self.request.model_dump(mode="json"),
-            )
-            invalid = client.post(
-                "/api/analyses",
-                json={"text": "   ", "reference_date": "2026-10-15"},
-            )
+        from backend.app.api.deps import get_current_user
+
+        app.dependency_overrides[get_current_user] = lambda: {
+            "id": "test-user-id",
+            "email": "test@commitai.local",
+            "created_at": "2026-10-15T17:00:00Z",
+        }
+
+        try:
+            with TestClient(app) as client:
+                response = client.post(
+                    "/api/analyses",
+                    json=self.request.model_dump(mode="json"),
+                )
+                invalid = client.post(
+                    "/api/analyses",
+                    json={"text": "   ", "reference_date": "2026-10-15"},
+                )
+        finally:
+            app.dependency_overrides.clear()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["candidates"], [])

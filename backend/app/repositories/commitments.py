@@ -4,12 +4,21 @@ from backend.app.core.errors import AppError
 from backend.app.db.database import connection
 
 
-def get_record(commitment_id: str) -> dict:
+def get_record(commitment_id: str, user_id: str | None = None) -> dict:
     with connection() as conn:
-        row = conn.execute(
-            "SELECT payload FROM commitments WHERE id = ?",
-            (commitment_id,),
-        ).fetchone()
+        if user_id:
+            row = conn.execute(
+                """
+                SELECT payload FROM commitments
+                WHERE id = ? AND (user_id = ? OR user_id IS NULL)
+                """,
+                (commitment_id, user_id),
+            ).fetchone()
+        else:
+            row = conn.execute(
+                "SELECT payload FROM commitments WHERE id = ?",
+                (commitment_id,),
+            ).fetchone()
 
     if row is None:
         raise AppError(
@@ -21,11 +30,20 @@ def get_record(commitment_id: str) -> dict:
     return json.loads(row["payload"])
 
 
-def list_records() -> list[dict]:
+def list_records(user_id: str | None = None) -> list[dict]:
     with connection() as conn:
-        rows = conn.execute(
-            "SELECT payload FROM commitments"
-        ).fetchall()
+        if user_id:
+            rows = conn.execute(
+                """
+                SELECT payload FROM commitments
+                WHERE user_id = ? OR user_id IS NULL
+                """,
+                (user_id,),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT payload FROM commitments"
+            ).fetchall()
 
     return [json.loads(row["payload"]) for row in rows]
 
@@ -35,6 +53,7 @@ def create_batch(
     request_hash: str,
     records: list[dict],
     response: dict,
+    user_id: str | None = None,
 ) -> tuple[dict, bool]:
     with connection() as conn:
         with conn:
@@ -61,9 +80,16 @@ def create_batch(
                 return json.loads(previous["response_json"]), True
 
             conn.executemany(
-                "INSERT INTO commitments (id, payload) VALUES (?, ?)",
+                """
+                INSERT INTO commitments (id, payload, user_id)
+                VALUES (?, ?, ?)
+                """,
                 [
-                    (record["id"], json.dumps(record, ensure_ascii=False))
+                    (
+                        record["id"],
+                        json.dumps(record, ensure_ascii=False),
+                        user_id,
+                    )
                     for record in records
                 ],
             )
@@ -84,15 +110,28 @@ def create_batch(
     return response, False
 
 
-def update_record(commitment_id: str, transform) -> dict:
+def update_record(
+    commitment_id: str,
+    transform,
+    user_id: str | None = None,
+) -> dict:
     with connection() as conn:
         with conn:
             conn.execute("BEGIN IMMEDIATE")
 
-            row = conn.execute(
-                "SELECT payload FROM commitments WHERE id = ?",
-                (commitment_id,),
-            ).fetchone()
+            if user_id:
+                row = conn.execute(
+                    """
+                    SELECT payload FROM commitments
+                    WHERE id = ? AND (user_id = ? OR user_id IS NULL)
+                    """,
+                    (commitment_id, user_id),
+                ).fetchone()
+            else:
+                row = conn.execute(
+                    "SELECT payload FROM commitments WHERE id = ?",
+                    (commitment_id,),
+                ).fetchone()
 
             if row is None:
                 raise AppError(

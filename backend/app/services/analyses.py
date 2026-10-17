@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from uuid import uuid4
 
@@ -14,6 +15,8 @@ from backend.app.schemas.analyses import (
     ExtractionOutput,
 )
 
+logger = logging.getLogger("commitai.analyses")
+
 
 def analyze_text(
     request: AnalysisRequest,
@@ -26,7 +29,12 @@ def analyze_text(
 
     try:
         output = ExtractionOutput.model_validate(raw)
-    except ValidationError:
+    except ValidationError as exc:
+        logger.error(
+            "Error de validación en ExtractionOutput: %s. raw=%s",
+            exc,
+            raw,
+        )
         raise invalid_response() from None
 
     candidates = []
@@ -35,12 +43,46 @@ def analyze_text(
         values = candidate.values.model_dump(mode="json")
         extraction = candidate.extraction.model_dump(mode="json")
 
-        if extraction["source_quote"] not in request.text:
-            raise invalid_response()
+        quote = (
+            extraction["source_quote"]
+            .replace("\r\n", "\n")
+            .replace("\r", "\n")
+            .strip()
+        )
+        text = request.text.replace("\r\n", "\n").replace("\r", "\n")
+
+        if quote not in text:
+            if quote.rstrip(".") in text:
+                extraction["source_quote"] = quote.rstrip(".")
+            elif (quote + ".") in text:
+                extraction["source_quote"] = quote + "."
+            else:
+                logger.warning(
+                    "source_quote no encontrado en el texto original.\nsource_quote: %r\nrequest.text: %r",
+                    quote,
+                    text,
+                )
+                raise invalid_response()
 
         for ambiguity in extraction["ambiguities"]:
-            if ambiguity["source_text"] not in request.text:
-                raise invalid_response()
+            ambiguity_text = (
+                ambiguity["source_text"]
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+                .strip()
+            )
+            if ambiguity_text not in text:
+                if ambiguity_text.rstrip(".") in text:
+                    ambiguity["source_text"] = ambiguity_text.rstrip(".")
+                elif (ambiguity_text + ".") in text:
+                    ambiguity["source_text"] = ambiguity_text + "."
+                else:
+                    logger.warning(
+                        "ambiguity source_text no encontrado en el texto original.\nsource_text: %r\nrequest.text: %r",
+                        ambiguity_text,
+                        text,
+                    )
+                    raise invalid_response()
 
             # Si el modelo reconoce ambigüedad, no conservar un
             # valor que parezca preciso para ese mismo campo.

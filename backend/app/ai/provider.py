@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Protocol
 
 import httpx
@@ -7,6 +8,8 @@ from backend.app.ai.prompts import SYSTEM_PROMPT
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
 from backend.app.schemas.analyses import ExtractionOutput
+
+logger = logging.getLogger("commitai.ai")
 
 
 class ExtractionProvider(Protocol):
@@ -145,19 +148,27 @@ class OpenAIProvider:
             data = response.json()
 
             if not isinstance(data, dict):
+                logger.error("La respuesta de la IA no es un diccionario: %s", type(data))
                 raise ValueError()
 
             if data.get("status") != "completed":
+                logger.error(
+                    "El estado de la respuesta de la IA no es 'completed': %s (detalles: %s)",
+                    data.get("status"),
+                    data.get("incomplete_details"),
+                )
                 raise ValueError()
 
             parts = [
                 part
-                for item in data["output"]
+                for item in data.get("output", [])
                 if item.get("type") == "message"
                 for part in item.get("content", [])
             ]
 
             if any(part.get("type") == "refusal" for part in parts):
+                refusals = [p for p in parts if p.get("type") == "refusal"]
+                logger.warning("La IA devolvió un rechazo: %s", refusals)
                 raise AppError(
                     "provider_refusal",
                     "La IA no pudo analizar este texto.",
@@ -173,11 +184,21 @@ class OpenAIProvider:
             parsed = json.loads(output)
 
             if not isinstance(parsed, dict):
+                logger.error("El contenido extraído no es un diccionario JSON: %s", type(parsed))
                 raise ValueError()
 
             return parsed
 
-        except (ValueError, KeyError, TypeError, AttributeError):
+        except AppError:
+            raise
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            logger.error(
+                "Error procesando respuesta del proveedor: %s. Response status=%s text=%.1000s",
+                exc,
+                response.status_code,
+                response.text,
+                exc_info=True,
+            )
             raise invalid_response() from None
 
 

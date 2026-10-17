@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.api.routes.analyses import router as analyses_router
+from backend.app.api.routes.auth import router as auth_router
 from backend.app.api.routes.commitments import router as commitments_router
 from backend.app.api.routes.health import router as health_router
 from backend.app.core.config import PROJECT_ROOT, get_settings
@@ -35,13 +36,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.app_name,
-    version="0.5.0",
+    version="0.6.0",
     description="API para detectar y gestionar compromisos.",
     lifespan=lifespan,
 )
 
 register_error_handlers(app)
 app.include_router(health_router, prefix="/api")
+app.include_router(auth_router, prefix="/api")
 app.include_router(commitments_router, prefix="/api")
 app.include_router(analyses_router, prefix="/api")
 
@@ -58,9 +60,20 @@ app.mount(
 def home():
     return FileResponse(FRONTEND_DIR / "index.html")
 
+
 @app.get("/dashboard", include_in_schema=False)
 def dashboard():
     return FileResponse(FRONTEND_DIR / "dashboard.html")
+
+
+@app.get("/login", include_in_schema=False)
+def login():
+    return FileResponse(FRONTEND_DIR / "login.html")
+
+
+@app.get("/register", include_in_schema=False)
+def register():
+    return FileResponse(FRONTEND_DIR / "register.html")
 
 @app.middleware("http")
 async def request_logging(request: Request, call_next):

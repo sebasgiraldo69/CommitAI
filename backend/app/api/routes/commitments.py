@@ -1,9 +1,10 @@
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Header, Query
+from fastapi import APIRouter, Depends, Header, Query
 from fastapi.responses import JSONResponse
 
+from backend.app.api.deps import get_current_user
 from backend.app.schemas.commitments import (
     CreateBatch,
     PatchCommitment,
@@ -18,10 +19,12 @@ router = APIRouter(prefix="/commitments", tags=["commitments"])
 def create(
     payload: CreateBatch,
     idempotency_key: Annotated[UUID, Header()],
+    current_user: Annotated[dict, Depends(get_current_user)],
 ):
     result, repeated = service.create_commitments(
         payload,
         str(idempotency_key),
+        user_id=current_user["id"],
     )
 
     return JSONResponse(
@@ -32,6 +35,7 @@ def create(
 
 @router.get("")
 def list_all(
+    current_user: Annotated[dict, Depends(get_current_user)],
     status: Status | None = None,
     responsible: str | None = None,
     limit: int = Query(default=20, ge=1, le=100),
@@ -44,14 +48,29 @@ def list_all(
         limit,
         offset,
         sort,
+        user_id=current_user["id"],
     )
 
 
 @router.get("/{commitment_id}")
-def get_one(commitment_id: UUID):
-    return service.get_commitment(str(commitment_id))
+def get_one(
+    commitment_id: UUID,
+    current_user: Annotated[dict, Depends(get_current_user)],
+):
+    return service.get_commitment(
+        str(commitment_id),
+        user_id=current_user["id"],
+    )
 
 
 @router.patch("/{commitment_id}")
-def update(commitment_id: UUID, payload: PatchCommitment):
-    return service.update_commitment(str(commitment_id), payload)
+def update(
+    commitment_id: UUID,
+    payload: PatchCommitment,
+    current_user: Annotated[dict, Depends(get_current_user)],
+):
+    return service.update_commitment(
+        str(commitment_id),
+        payload,
+        user_id=current_user["id"],
+    )

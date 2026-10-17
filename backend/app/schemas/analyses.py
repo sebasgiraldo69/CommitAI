@@ -30,7 +30,7 @@ class AnalysisRequest(StrictModel):
     @classmethod
     def normalize_text(cls, value):
         if isinstance(value, str):
-            return value.strip()
+            return value.replace("\r\n", "\n").replace("\r", "\n").strip()
         return value
 
     @field_validator("reference_date", mode="before")

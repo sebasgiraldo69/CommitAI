@@ -1,6 +1,18 @@
-import { request } from "./api.js";
+import { getToken, getUser, logout, request } from "./api.js";
+
+if (!getToken()) {
+  window.location.href = "/login";
+}
 
 const $ = (id) => document.getElementById(id);
+
+const user = getUser();
+if (user && $("user-email")) {
+  $("user-email").textContent = user.email;
+}
+if ($("logout-btn")) {
+  $("logout-btn").addEventListener("click", logout);
+}
 
 const STORAGE_KEY = "commitai.pending-save.v1";
 

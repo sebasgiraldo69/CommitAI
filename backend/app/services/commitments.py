@@ -34,6 +34,7 @@ def create_commitments(
     payload: CreateBatch,
     key: str,
     now: datetime | None = None,
+    user_id: str | None = None,
 ) -> tuple[dict, bool]:
     now = now or utc_now()
     normalized = payload.model_dump(mode="json")
@@ -62,6 +63,8 @@ def create_commitments(
             "created_at": timestamp(now),
             "updated_at": timestamp(now),
         }
+        if user_id:
+            record["user_id"] = user_id
         records.append(record)
 
     response = {
@@ -73,11 +76,15 @@ def create_commitments(
         request_hash,
         records,
         response,
+        user_id=user_id,
     )
 
 
-def get_commitment(commitment_id: str) -> dict:
-    return public_record(repository.get_record(commitment_id), utc_now())
+def get_commitment(commitment_id: str, user_id: str | None = None) -> dict:
+    return public_record(
+        repository.get_record(commitment_id, user_id=user_id),
+        utc_now(),
+    )
 
 
 def list_commitments(
@@ -86,9 +93,10 @@ def list_commitments(
     limit: int,
     offset: int,
     sort: str,
+    user_id: str | None = None,
 ) -> dict:
     now = utc_now()
-    records = repository.list_records()
+    records = repository.list_records(user_id=user_id)
 
     if responsible is not None:
         records = [
@@ -139,6 +147,7 @@ def update_commitment(
     commitment_id: str,
     payload: PatchCommitment,
     now: datetime | None = None,
+    user_id: str | None = None,
 ) -> dict:
     now = now or utc_now()
 
@@ -184,5 +193,9 @@ def update_commitment(
 
         return record
 
-    record = repository.update_record(commitment_id, transform)
+    record = repository.update_record(
+        commitment_id,
+        transform,
+        user_id=user_id,
+    )
     return public_record(record, now)

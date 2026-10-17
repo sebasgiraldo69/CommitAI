@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CommitAI | Crear cuenta</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .auth-container {
+      max-width: 440px;
+      margin: 60px auto;
+      padding: 32px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px #17283e08;
+    }
+    .auth-container h2 {
+      margin-bottom: 8px;
+    }
+    .auth-container p.subtitle {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    .auth-form label {
+      display: block;
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .auth-form input {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font: inherit;
+    }
+    .auth-form button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+    }
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .auth-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+    .message {
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      display: none;
+    }
+    .message.error {
+      display: block;
+      background: #fde8e8;
+      color: #9b1c1c;
+      border: 1px solid #f8b4b4;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <p class="eyebrow">DE LA CONVERSACIÓN A LA ACCIÓN</p>
+      <h1>Commit<span>AI</span></h1>
+    </div>
+    <a class="badge" href="/login">Iniciar sesión →</a>
+  </header>
+
+  <main>
+    <div class="auth-container">
+      <h2>Crear cuenta</h2>
+      <p class="subtitle">Regístrate para guardar y dar seguimiento a tus compromisos.</p>
+
+      <div id="auth-message" class="message"></div>
+
+      <form id="register-form" class="auth-form">
+        <label>
+          Correo electrónico
+          <input id="email" type="email" required autocomplete="email" placeholder="usuario@correo.com">
+        </label>
+
+        <label>
+          Contraseña (mínimo 6 caracteres)
+          <input id="password" type="password" required minlength="6" autocomplete="new-password" placeholder="••••••••">
+        </label>
+
+        <label>
+          Confirmar contraseña
+          <input id="confirm-password" type="password" required minlength="6" autocomplete="new-password" placeholder="••••••••">
+        </label>
+
+        <button type="submit" id="submit-btn">Crear mi cuenta</button>
+      </form>
+
+      <div class="auth-footer">
+        ¿Ya tienes una cuenta? <a href="/login">Inicia sesión</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/assets/register.js"></script>
+</body>
+</html>
