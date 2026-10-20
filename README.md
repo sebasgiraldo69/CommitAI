@@ -227,3 +227,67 @@ Guardar los archivos y recargar con Ctrl+F5.
 - [Contratos de API](docs/contratos-api.md)
 - [Respaldo y recuperación](docs/respaldo-sqlite.md)
 - [Guion de demostración](docs/guion-demostracion.md)
+
+
+---
+
+## Product Evaluation
+
+### Evaluation URL
+
+https://commitai.onrender.com/login
+
+### Initial SHA
+
+`3bf0079f`
+
+### Current score
+
+Evaluación inicial con 5 perfiles sintéticos:
+
+- Usuario ideal: PASS
+- Usuario confundido: PASS
+- Entrada vacía / inválida / extrema: FAIL parcial
+- Adversarial / prompt injection: PASS
+- Repetición / demora / interrupción: FAIL inicial
+
+La falla prioritaria fue corregida.
+
+El caso reproducible asociado a resultados desactualizados pasó de FAIL a PASS.
+
+Pruebas posteriores a la corrección:
+
+**8/8 PASS**
+
+### Known failure
+
+La experiencia para entradas cercanas al límite de 20.000 caracteres todavía puede mejorar.
+
+El límite existe, pero no se muestra suficiente feedback visual para explicar al usuario por qué una entrada extrema no puede analizarse.
+
+### Next hypothesis
+
+Mostrar un contador de caracteres y una advertencia visible al acercarse al límite máximo reducirá la confusión y mejorará la recuperación ante entradas extremas.
+
+### Priority fix
+
+Se corrigió una falla de severidad alta en la que los compromisos detectados permanecían visibles después de modificar la conversación.
+
+Ahora, cuando el texto cambia:
+
+- se invalida el análisis anterior;
+- se eliminan candidatos;
+- se limpian selecciones;
+- se deshabilita el guardado;
+- se solicita ejecutar nuevamente el análisis;
+- se invalidan respuestas tardías.
+
+### Reproducible test
+
+Test:
+
+`frontend/tests/analysis-invalidation.test.cjs`
+
+Resultado final:
+
+**8/8 pruebas pasan**

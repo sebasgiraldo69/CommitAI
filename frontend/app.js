@@ -64,6 +64,18 @@ function localDate(timezone) {
 
 $("reference-date").value = localDate("America/Bogota");
 
+$("text").addEventListener("input", () => {
+  // An uncertain save must retain its idempotent retry; the input is locked.
+  if (state.pendingSave || (!state.analysis && !state.busy)) return;
+
+  state.generation += 1;
+  state.analysis = null;
+  state.candidates = [];
+  state.busy = false;
+  renderCandidates();
+  message("El texto cambió. Analiza nuevamente para detectar compromisos.");
+});
+
 function acceptedCandidates() {
   return state.candidates.filter(
     (candidate) => candidate.decision === "accepted",
@@ -372,6 +384,7 @@ $("analysis-form").addEventListener("submit", async (event) => {
       "success",
     );
   } catch (error) {
+    if (generation !== state.generation) return;
     message(error.message, "error");
   } finally {
     if (generation === state.generation) {
