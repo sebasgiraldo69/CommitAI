@@ -87,6 +87,7 @@ async def request_logging(request: Request, call_next):
             "request_id=%s exception_type=%s",
             request.state.request_id,
             type(exc).__name__,
+            exc_info=True,
         )
         response = error_response(
             request,

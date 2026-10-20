@@ -1,7 +1,6 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
 
 from backend.app.api.deps import get_current_user
 from backend.app.schemas.users import (
@@ -21,8 +20,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     status_code=status.HTTP_201_CREATED,
 )
 def register(payload: UserRegisterRequest):
-    result = service.register_user(payload.email, payload.password)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=result)
+    return service.register_user(payload.email, payload.password)
 
 
 @router.post("/login", response_model=TokenResponse)
